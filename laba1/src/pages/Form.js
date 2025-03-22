@@ -22,10 +22,15 @@ const Form = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post("http://localhost:5000/sensors", formData)
+    
+        axios.post("http://localhost:5000/sensors", JSON.stringify(formData), {
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        })
         .then(() => navigate('/'))
         .catch(error => console.error("Ошибка добавления:", error));
-    };
+      };
 
     return (
     <div style={{ padding: '20px' }}>

@@ -6,7 +6,10 @@
       "status": "Норма",
       "location": "ул. Приколистов, 91",
       "type": "Пожарный",
-      "signal": 80
+      "signal": 80,
+      "batteryLevel": 75,
+      "lastChecked": "2025-03-15",
+      "isOnline": true
     },
     {
       "id": "2",
@@ -14,7 +17,9 @@
       "status": "Норма",
       "location": "ул. Окружная, 29в",
       "type": "Дымовой",
-      "signal": 45
+      "signal": 45,
+      "lastChecked": "2025-03-17",
+      "isOnline": false
     },
     {
       "id": "3",
@@ -22,7 +27,9 @@
       "status": "Норма",
       "location": "ул. Большая Спасская, 18",
       "type": "Тепловой",
-      "signal": 93
+      "signal": 93,
+      "lastChecked": "2025-03-10",
+      "isOnline": true
     },
     {
       "id": "4",
@@ -30,7 +37,9 @@
       "status": "Норма",
       "location": "ул. Океанная, 44",
       "type": "Газовый",
-      "signal": 60
+      "signal": 60,
+      "lastChecked": "2025-03-18",
+      "isOnline": true
     }
   ]
 }
