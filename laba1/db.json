@@ -50,5 +50,13 @@
       "lastChecked": "2024-11-14",
       "isOnline": false
     }
+  ],
+  "users": [
+    {
+      "id": "7fb7",
+      "username": "test_user",
+      "email": "test_user@gmail.com",
+      "password": "1111"
+    }
   ]
 }
