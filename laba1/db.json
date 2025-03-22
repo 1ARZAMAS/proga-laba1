@@ -7,7 +7,6 @@
       "location": "ул. Приколистов, 91",
       "type": "Пожарный",
       "signal": 80,
-      "batteryLevel": 75,
       "lastChecked": "2025-03-15",
       "isOnline": true
     },
@@ -40,6 +39,16 @@
       "signal": 60,
       "lastChecked": "2025-03-18",
       "isOnline": true
+    },
+    {
+      "id": "5f53",
+      "name": "Новый датчик",
+      "status": "Норма",
+      "type": "Пожарный",
+      "location": "ул. Кафки, 40",
+      "signal": 50,
+      "lastChecked": "2024-11-14",
+      "isOnline": false
     }
   ]
 }

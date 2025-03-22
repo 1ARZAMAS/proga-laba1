@@ -1,42 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { SensorContext } from '../SensorContext';
 
 const Detail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+
+    const {
+        sensors,
+        updateSensor: updateSensorInContext,
+        deleteSensor: deleteSensorFromContext
+    } = useContext(SensorContext);
+
     const [sensor, setSensor] = useState(null);
 
-    useEffect(() => {
-    axios.get(`http://localhost:5000/sensors/${id}`)
-    .then(response => setSensor(response.data))
-    .catch(error => console.error("Ошибка загрузки датчика:", error));
-    }, [id]);
+    useEffect(() => { // получим нужный датчик из контекста
+        const foundSensor = sensors.find(s => String(s.id) === id);
+        if (foundSensor) {
+            setSensor(foundSensor);
+        }
+    }, [id, sensors]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setSensor(prev => ({
             ...prev,
-            [name]: name === "signal" ? Number(value) : value
+            [name]: type === 'checkbox'
+                ? checked
+                : name === 'signal'
+                    ? Number(value)
+                    : value
         }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.put(`http://localhost:5000/sensors/${id}`, JSON.stringify(sensor), {
-            headers: {
-            'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         })
-        .then(() => navigate('/'))
+        .then(response => {
+            updateSensorInContext(response.data);
+            navigate('/');
+        })
         .catch(error => console.error("Ошибка обновления:", error));
     };
 
     const handleDelete = () => {
         if (window.confirm("Вы уверены, что хотите удалить этот датчик?")) {
             axios.delete(`http://localhost:5000/sensors/${id}`)
-            .then(() => navigate('/'))
-            .catch(error => console.error("Ошибка удаления:", error));
+                .then(() => {
+                    deleteSensorFromContext(id);
+                    navigate('/');
+                })
+                .catch(error => console.error("Ошибка удаления:", error));
         }
     };
 
@@ -44,7 +61,6 @@ const Detail = () => {
 
     return (
         <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
-            {/* Форма редактирования */}
             <div style={{ flex: 1 }}>
                 <h1>Редактирование датчика</h1>
                 <form onSubmit={handleSubmit}>
@@ -90,10 +106,7 @@ const Detail = () => {
                             type="checkbox"
                             name="isOnline"
                             checked={sensor.isOnline || false}
-                            onChange={(e) => setSensor(prev => ({
-                            ...prev,
-                            isOnline: e.target.checked
-                            }))}
+                            onChange={handleChange}
                         />
                     </label>
                     <br /><br />
@@ -108,7 +121,6 @@ const Detail = () => {
                 </form>
             </div>
 
-            {/* Таблица с текущими данными */}
             <div style={{ flex: 1 }}>
                 <h2>Текущие данные датчика</h2>
                 <table border="1" cellPadding="8" cellSpacing="0">
@@ -117,14 +129,14 @@ const Detail = () => {
                             <tr key={key}>
                                 <td><strong>{key}</strong></td>
                                 <td>
-                                {key === 'isOnline'
-                                    ? value
-                                    ? 'Онлайн'
-                                    : 'Оффлайн'
-                                    : value}
+                                    {key === 'isOnline'
+                                        ? value
+                                            ? 'Онлайн'
+                                            : 'Оффлайн'
+                                        : String(value)}
                                 </td>
                             </tr>
-                            ))}
+                        ))}
                     </tbody>
                 </table>
             </div>
