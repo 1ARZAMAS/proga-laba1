@@ -8,6 +8,7 @@ import { AuthProvider } from './auth/AuthContext';
 import PrivateRoute from './auth/PrivateRoute';
 import Login from './auth/Login';
 import Register from './auth/Register';
+import NotFound from './pages/NotFound';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
             <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
             <Route path="/detail/:id" element={<PrivateRoute><Detail /></PrivateRoute>} />
             <Route path="/add" element={<PrivateRoute><Form /></PrivateRoute>} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </AuthProvider>

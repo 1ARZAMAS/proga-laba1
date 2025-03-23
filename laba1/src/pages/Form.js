@@ -17,6 +17,8 @@ const Form = () => {
         isOnline: true
     });
 
+    const [error, setError] = useState(null);
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -29,24 +31,43 @@ const Form = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
 
-        axios.post("http://localhost:5000/sensors", JSON.stringify(formData), {
-            headers: {
-                'Content-Type': 'application/json'
+        try {
+            const response = await axios.post("http://localhost:5000/sensors", JSON.stringify(formData), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            addSensor(response.data);
+            navigate('/');
+        } catch (error) {
+            if (error.response) {
+                switch (error.response.status) {
+                    case 400:
+                        setError('Некорректные данные. Проверьте введенные значения.');
+                        break;
+                    case 500:
+                        setError('Ошибка сервера. Попробуйте позже.');
+                        break;
+                    default:
+                        setError('Не удалось добавить датчик. Попробуйте позже.');
+                }
+            } else {
+                setError('Ошибка соединения. Проверьте подключение к серверу.');
             }
-        })
-            .then(response => {
-                addSensor(response.data); // добавляем в state
-                navigate('/');
-            })
-            .catch(error => console.error("Ошибка добавления:", error));
+        }
     };
 
     return (
         <div style={{ padding: '20px' }}>
             <h1>Добавить датчик</h1>
+            
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+
             <form onSubmit={handleSubmit}>
                 <label>
                     Название:

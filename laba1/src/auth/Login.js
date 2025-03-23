@@ -15,17 +15,33 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!form.username || !form.password) {
             setError('Заполните все поля');
             return;
         }
 
-        const result = await login(form.username, form.password);
-        if (result.success) {
-            navigate('/');
-        } else {
-            setError(result.message);
+        try {
+            const result = await login(form.username, form.password);
+            if (result.success) {
+                navigate('/');
+            } else {
+                setError(result.message);
+            }
+        } catch (error) {
+            if (error.response) {
+                switch (error.response.status) {
+                    case 400:
+                        setError('Ошибка входа: некорректные данные.');
+                        break;
+                    case 500:
+                        setError('Ошибка сервера. Попробуйте позже.');
+                        break;
+                    default:
+                        setError('Ошибка входа. Попробуйте позже.');
+                }
+            } else {
+                setError('Ошибка соединения с сервером. Проверьте интернет-соединение.');
+            }
         }
     };
 
@@ -35,9 +51,20 @@ const Login = () => {
             {error && <p className="error">{error}</p>}
             <form onSubmit={handleSubmit}>
                 <label>Имя пользователя:</label>
-                <input name="username" value={form.username} onChange={handleChange} required />
+                <input 
+                    name="username" 
+                    value={form.username} 
+                    onChange={handleChange} 
+                    required 
+                />
                 <label>Пароль:</label>
-                <input type="password" name="password" value={form.password} onChange={handleChange} required />
+                <input 
+                    type="password" 
+                    name="password" 
+                    value={form.password} 
+                    onChange={handleChange} 
+                    required 
+                />
                 <button type="submit">Войти</button>
             </form>
             <div className="back-link">

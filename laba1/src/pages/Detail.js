@@ -14,11 +14,14 @@ const Detail = () => {
     } = useContext(SensorContext);
 
     const [sensor, setSensor] = useState(null);
+    const [error, setError] = useState(null);
 
-    useEffect(() => { // получим нужный датчик из контекста
+    useEffect(() => {
         const foundSensor = sensors.find(s => String(s.id) === id);
         if (foundSensor) {
             setSensor(foundSensor);
+        } else {
+            setError('Датчик не найден');
         }
     }, [id, sensors]);
 
@@ -26,36 +29,74 @@ const Detail = () => {
         const { name, value, type, checked } = e.target;
         setSensor(prev => ({
             ...prev,
-            [name]: type === 'checkbox'
-                ? checked
-                : name === 'signal'
-                    ? Number(value)
-                    : value
+            [name]: type === 'checkbox' ? checked : name === 'signal' ? Number(value) : value
         }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.put(`http://localhost:5000/sensors/${id}`, JSON.stringify(sensor), {
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => {
-            updateSensorInContext(response.data);
-            navigate('/');
-        })
-        .catch(error => console.error("Ошибка обновления:", error));
+        try {
+            axios.put(`http://localhost:5000/sensors/${id}`, JSON.stringify(sensor), {
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+                updateSensorInContext(response.data);
+                navigate('/');
+            })
+        } catch (error) {
+            if (error.response) {
+                switch (error.response.status) {
+                    case 400:
+                        setError('Некорректные данные. Проверьте введенные значения.');
+                        break;
+                    case 500:
+                        setError('Внутренняя ошибка сервера. Попробуйте позже.');
+                        break;
+                    default:
+                        setError('Ошибка обновления. Попробуйте позже.');
+                }
+            } else {
+                setError('Ошибка соединения с сервером.');
+            }
+        }
     };
 
     const handleDelete = () => {
         if (window.confirm("Вы уверены, что хотите удалить этот датчик?")) {
-            axios.delete(`http://localhost:5000/sensors/${id}`)
+            try {
+                axios.delete(`http://localhost:5000/sensors/${id}`)
                 .then(() => {
                     deleteSensorFromContext(id);
                     navigate('/');
                 })
                 .catch(error => console.error("Ошибка удаления:", error));
+            } catch (error) {
+                if (error.response) {
+                    switch (error.response.status) {
+                        case 400:
+                            setError('Невозможно удалить датчик. Некорректный запрос.');
+                            break;
+                        case 500:
+                            setError('Ошибка сервера. Повторите попытку позже.');
+                            break;
+                        default:
+                            setError('Ошибка удаления. Попробуйте позже.');
+                    }
+                } else {
+                    setError('Ошибка соединения с сервером.');
+                }
+            }
         }
     };
+
+    if (error) {
+        return (
+            <div>
+                <h1>{error}</h1>
+                <p>Перейдите на <a href="/">главную страницу</a>.</p>
+            </div>
+        );
+    }
 
     if (!sensor) return <div>Загрузка...</div>;
 
@@ -63,6 +104,7 @@ const Detail = () => {
         <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
             <div style={{ flex: 1 }}>
                 <h1>Редактирование датчика</h1>
+                {error && <div style={{ color: 'red' }}>{error}</div>}
                 <form onSubmit={handleSubmit}>
                     <label>
                         Название:
@@ -91,23 +133,12 @@ const Detail = () => {
                     <br /><br />
                     <label>
                         Последняя проверка:
-                        <input
-                            type="date"
-                            name="lastChecked"
-                            value={sensor.lastChecked || ''}
-                            onChange={handleChange}
-                            required
-                        />
+                        <input type="date" name="lastChecked" value={sensor.lastChecked || ''} onChange={handleChange} required />
                     </label>
                     <br /><br />
                     <label>
                         Онлайн:
-                        <input
-                            type="checkbox"
-                            name="isOnline"
-                            checked={sensor.isOnline || false}
-                            onChange={handleChange}
-                        />
+                        <input type="checkbox" name="isOnline" checked={sensor.isOnline || false} onChange={handleChange} />
                     </label>
                     <br /><br />
                     <button type="submit">💾 Сохранить</button>
@@ -129,11 +160,7 @@ const Detail = () => {
                             <tr key={key}>
                                 <td><strong>{key}</strong></td>
                                 <td>
-                                    {key === 'isOnline'
-                                        ? value
-                                            ? 'Онлайн'
-                                            : 'Оффлайн'
-                                        : String(value)}
+                                    {key === 'isOnline' ? (value ? 'Онлайн' : 'Оффлайн') : String(value)}
                                 </td>
                             </tr>
                         ))}
