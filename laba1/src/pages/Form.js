@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { SensorContext } from '../SensorContext';
+import { ClipLoader } from "react-spinners";
 
 const Form = () => {
     const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Form = () => {
     });
 
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -33,6 +35,7 @@ const Form = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         setError(null);
 
         try {
@@ -61,6 +64,23 @@ const Form = () => {
             }
         }
     };
+
+    if (error) {
+        return (
+            <div>
+                <h1>{error}</h1>
+                <p>Перейдите на <a href="/">главную страницу</a>.</p>
+            </div>
+        );
+    }
+
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <ClipLoader color="#007bff" size={50} />
+            </div>
+        );
+    }
 
     return (
         <div style={{ padding: '20px' }}>

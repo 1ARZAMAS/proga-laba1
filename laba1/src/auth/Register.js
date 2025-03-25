@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import './Auth.css';
+import { ClipLoader } from "react-spinners";
 
 const Register = () => {
     const { register } = useContext(AuthContext);
@@ -13,6 +14,7 @@ const Register = () => {
         confirm: '',
     });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,6 +27,8 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError(null);
 
         if (!form.username || !form.email || !form.password || !form.confirm) {
             setError('Все поля должны быть заполнены');
@@ -69,6 +73,14 @@ const Register = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <ClipLoader color="#007bff" size={50} />
+            </div>
+        );
+    }
+    
     return (
         <div className="auth-container">
             <h1>Регистрация</h1>

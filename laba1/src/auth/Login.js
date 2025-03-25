@@ -2,12 +2,14 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import './Auth.css';
+import { ClipLoader } from "react-spinners";
 
 const Login = () => {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
     const [form, setForm] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,6 +17,9 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError(null);
+
         if (!form.username || !form.password) {
             setError('Заполните все поля');
             return;
@@ -44,6 +49,14 @@ const Login = () => {
             }
         }
     };
+    
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <ClipLoader color="#007bff" size={50} />
+            </div>
+        );
+    }
 
     return (
         <div className="auth-container">

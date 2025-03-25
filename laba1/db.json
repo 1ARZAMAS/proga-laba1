@@ -41,13 +41,13 @@
       "isOnline": true
     },
     {
-      "id": "5f53",
+      "id": "b4a1",
       "name": "Новый датчик",
       "status": "Норма",
       "type": "Пожарный",
-      "location": "ул. Кафки, 40",
+      "location": "ул. Франца Кафки, 40",
       "signal": 50,
-      "lastChecked": "2024-11-14",
+      "lastChecked": "2025-02-24",
       "isOnline": false
     }
   ],

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { SensorContext } from '../SensorContext';
+import { ClipLoader } from "react-spinners";
 
 const Detail = () => {
     const { id } = useParams();
@@ -15,6 +16,7 @@ const Detail = () => {
 
     const [sensor, setSensor] = useState(null);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const foundSensor = sensors.find(s => String(s.id) === id);
@@ -35,6 +37,8 @@ const Detail = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError(null);
         try {
             axios.put(`http://localhost:5000/sensors/${id}`, JSON.stringify(sensor), {
                 headers: { 'Content-Type': 'application/json' }
@@ -62,6 +66,7 @@ const Detail = () => {
     };
 
     const handleDelete = () => {
+        setLoading(true);
         if (window.confirm("Вы уверены, что хотите удалить этот датчик?")) {
             try {
                 axios.delete(`http://localhost:5000/sensors/${id}`)
@@ -98,7 +103,15 @@ const Detail = () => {
         );
     }
 
-    if (!sensor) return <div>Загрузка...</div>;
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <ClipLoader color="#007bff" size={50} />
+            </div>
+        );
+    }
+
+    if (!sensor) return <div style={{ color: 'red', textAlign: 'center' }}>{error || 'Ошибка загрузки'}</div>;
 
     return (
         <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
